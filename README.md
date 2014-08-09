@@ -22,7 +22,7 @@ See the list of [Issues](https://github.com/charleso/sbt2nix/issues) for where t
 
 Please contact me if you're interested. As a word of warning I'm quite lazy and this repository may remain empty for some time/forever.
 
-## Appendex 1 - Hard shit
+## Appendix 1 - Hard shit
 
 Some things that may be a step-back from SBT in this Nix world.
 
