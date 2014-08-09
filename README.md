@@ -16,11 +16,9 @@ From Lex Spoon's [Recursive Maven Considered Harmful](http://blog.lexspoon.org/2
 
 ## Help wanted
 
-We need _you_!
+We need _you_! Come and chat on `##nix-sbt` if you want to know more.
 
-See the list of [Issues](https://github.com/charleso/sbt2nix/issues) for where to start.
-
-Please contact me if you're interested. As a word of warning I'm quite lazy and this repository may remain empty for some time/forever.
+See the list of [Issues](https://github.com/charleso/sbt2nix/issues) for an overview on what needs to happen.
 
 ## Appendix 1 - Hard shit
 
