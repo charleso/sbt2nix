@@ -107,4 +107,7 @@ We need _you_! Come and chat on Freenode `##nix-sbt` if you want to know more.
 
 See the list of [Issues](https://github.com/charleso/sbt2nix/issues) for an overview on what needs to happen.
 
-
+The current code is something hacked together in roughly a day, so please don't judge it too harshly.
+The important thing at the moment is the generated Nix output, which will need to be improved in a number of ways,
+as outlined in various issues.
+If you have any experience in Nix, your input and suggestions on what we needs to happen will be much appreciated.
