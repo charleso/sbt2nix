@@ -41,12 +41,8 @@ object NixPlugin extends Plugin {
             } yield (name, FileUtils.relativize(bd, base))
         }.flatten
 
-        println()
-        println("ME: " + project)
-        println("PROJECTS: " + projs)
         val deps = externalDependencies(ref, state)(config)
         deps.foreach(alldeps += _)
-        println("DEPS: " + deps)
         val name = setting(Keys.name in ref, state).getOrElse("Unknown")
         // TODO Use \/
         val version = setting(Keys.version in ref, state).getOrElse("1.0-SNAPSHOT")
@@ -111,7 +107,6 @@ object NixPlugin extends Plugin {
   }
 
   def lib(a: ModuleID, f: File): String = {
-    println(s"Prefetching ${a.toString()}")
     // TODO We probably should replace this with pure Java. We need to generate a sha256 in base32:
     // http://lists.science.uu.nl/pipermail/nix-dev/2013-April/010885.html
     import scala.sys.process._
