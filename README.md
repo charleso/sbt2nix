@@ -3,6 +3,8 @@ sbt2nix
 
 Generate Nix build instructions from a SBT project
 
+[![Build Status](https://travis-ci.org/charleso/sbt2nix.png)](https://travis-ci.org/charleso/sbt2nix)
+
 ## Warning
 
 This is (currently) an *experimental* project to force myself (and hopefully others) to get cracking on building a set
