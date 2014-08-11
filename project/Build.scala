@@ -36,6 +36,7 @@ object Build extends Build {
         dep.copy(revision = sbtVersion)
       },
       publishArtifact in (Compile, packageDoc) := false,
-      publishArtifact in (Compile, packageSrc) := false
+      publishArtifact in (Compile, packageSrc) := false,
+      resolvers := Seq(Resolver.sonatypeRepo("releases"))
     )
 }
