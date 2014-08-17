@@ -84,7 +84,7 @@ object NixPlugin extends Plugin {
           }
           s"""{ sbt ? import $depsPath/sbt.nix {}, deps ? import $depsPath/deps.nix { inherit sbt; } }:
             |{
-            |${aggs.map { case (name, a) => name + " = sbt.callPackage " + a + " {};" }.mkString("\n")}
+            |${aggs.map { case (name, a) => name + " = sbt.callPackage " + a + " { inherit sbt deps; };" }.mkString("\n")}
             |}""".stripMargin
         }
         FileUtils.save(bd / "default.nix", s).unsafePerformIO()
