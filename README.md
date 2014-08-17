@@ -77,10 +77,8 @@ And lastly a single `deps.nix` will be generated:
 {
   commons-io_commons-io_2_4 = sbt.artifact {
     org = "commons-io";
-    name = "commons-io";
+    jarname = "commons-io";
     version = "2.4";
-    # TODO This file shouldn't exist - we should be able to resolve by ourselves
-    file = "file:///home/me/.ivy2/cache/commons-io/commons-io/jars/commons-io-2.4.jar";
     sha256 = "108mw2v8ncig29kjvzh8wi76plr01f4x5l3b1929xk5a7vf42snc";
   };
 }

@@ -114,10 +114,8 @@ object NixPlugin extends Plugin {
     s"""
       |${toName(a)} = sbt.artifact {
       |  org = "${a.organization}";
-      |  name = "${a.name}";
+      |  jarname = "${a.name}";
       |  version = "${a.revision}";
-      |  # TODO This file shouldn't exist - we should be able to resolve by ourselves
-      |  file = "file://${f.getAbsolutePath}";
       |  sha256 = "$sha";
       |};
       """.stripMargin

@@ -4,18 +4,22 @@ let
   self = _self;
   _self = with self; {
 
-  artifact = {org, name, version, file, sha256}: stdenv.mkDerivation {
-    name = "${org}.${name}.${version}";
+  artifact = {org, jarname, version, sha256}: stdenv.mkDerivation (rec {
+    name = "${org}.${jarname}.${version}";
+    orgpath = stdenv.lib.replaceChars ["."] ["/"] org;
+    maven = "${orgpath}/${jarname}/${version}/${jarname}-${version}.jar";
+    jar = pkgs.fetchurl { urls = [
+      "http://central.maven.org/maven2/${maven}"
+      "http://oss.sonatype.org/content/repositories/releases/${maven}"
+      "http://oss.sonatype.org/content/repositories/public/${maven}"
+      "http://repo.typesafe.com/typesafe/releases/${maven}"
+    ]; sha256 = sha256; };
     phases = "installPhase fixupPhase";
-    jar = pkgs.fetchurl {
-      url = file;
-      sha256 = sha256;
-    };
     installPhase = ''
       mkdir -p $out/share/java
       ln -s $jar $out/share/java
     '';
-  };
+  });
 
   mkDerivation = args@{
       pname,
