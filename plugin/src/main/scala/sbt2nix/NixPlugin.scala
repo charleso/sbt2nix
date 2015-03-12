@@ -60,7 +60,8 @@ object NixPlugin extends Plugin {
           // TODO We need to handle test files + dependencies as well
           // Is there a way not to have to inherit sbt manually here?
           val scalacOpts = evaluateTask(Keys.scalacOptions, ref, state).mkString(" ")
-          s"""{ sbt ? import $depsPath/sbt.nix {}, deps ? import $depsPath/deps.nix { inherit sbt; } }:
+          s"""{ sbt ? import $depsPath/sbt.nix {}, deps ? import $depsPath/deps.nix { inherit sbt; }
+            |${deps.map(x => ", " + toName(x.artifact) + " ? " + "deps." + toName(x.artifact)).mkString("")} }:
             |let
             |${projs.map(x => proj(x._1, x._2)).mkString("\n")}
             |
@@ -72,7 +73,7 @@ object NixPlugin extends Plugin {
             |  modules = [ ${projs.map(_._1).mkString(" ")} ];
             |  scalacOptions = "$scalacOpts";
             |  buildDepends = [
-            |    ${deps.map(x => toName(x.artifact)).map("deps." +).mkString(" ")}
+            |    ${deps.map(x => toName(x.artifact)).mkString(" ")}
             |  ];
             |  meta = {
             |    ${desc.map(d => "description = " + "\"" + d + "\";").getOrElse("")}
