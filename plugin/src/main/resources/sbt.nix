@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {}, scala ? pkgs.scala_2_11 }:
+{ pkgs ? import <nixpkgs> {}, scala ? pkgs.scala_2_11, jdk ? pkgs.openjdk }:
 let
   stdenv = pkgs.stdenv;
   self = _self;
@@ -31,7 +31,7 @@ let
       ...
     }: stdenv.mkDerivation(args // {
     name = "${pname}";
-    nativeBuildInputs = [ pkgs.openjdk scala ];
+    nativeBuildInputs = [ jdk scala ];
     buildInputs = buildDepends ++ modules;
     # TODO Don't call javac if there are no java files
     buildPhase = ''

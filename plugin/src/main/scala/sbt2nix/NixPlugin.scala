@@ -47,12 +47,13 @@ object NixPlugin extends Plugin {
         // TODO Use \/
         val version = setting(Keys.version in ref, state).getOrElse("1.0-SNAPSHOT")
         val desc = setting(Keys.description in ref, state)
-
         def proj(name: String, base: File): String = {
           s"$name = import $base { inherit sbt deps; };"
         }
 
         val depsPath = FileUtils.relativize(bd, base).getPath
+        val javacV = javacVersion(evaluateTask(Keys.javacOptions, ref, state))
+
         val s = if (project.aggregate.isEmpty) {
           // Nix can only handle source directories that exist
           val src = setting(Keys.unmanagedSourceDirectories in (ref, config), state).getOrElse(Nil)
@@ -60,7 +61,8 @@ object NixPlugin extends Plugin {
           // TODO We need to handle test files + dependencies as well
           // Is there a way not to have to inherit sbt manually here?
           val scalacOpts = evaluateTask(Keys.scalacOptions, ref, state).mkString(" ")
-          s"""{ sbt ? import $depsPath/sbt.nix {}, deps ? import $depsPath/deps.nix { inherit sbt; }
+
+          s"""{ sbt ? import $depsPath/sbt.nix { jdk = (import <nixpkgs> {}).$javacV ;}, deps ? import $depsPath/deps.nix { inherit sbt; }
             |${deps.map(x => ", " + toName(x.artifact) + " ? " + "deps." + toName(x.artifact)).mkString("")} }:
             |let
             |${projs.map(x => proj(x._1, x._2)).mkString("\n")}
@@ -83,7 +85,7 @@ object NixPlugin extends Plugin {
           val aggs = project.aggregate.map {
             subref => subref.project -> FileUtils.relativize(base, baseDirectory(subref, state).getOrElse(???)).getPath
           }
-          s"""{ sbt ? import $depsPath/sbt.nix {}, deps ? import $depsPath/deps.nix { inherit sbt; } }:
+          s"""{ sbt ? import $depsPath/sbt.nix { jdk = (import <nixpkgs> {}).$javacV; }, deps ? import $depsPath/deps.nix { inherit sbt; } }:
             |{
             |${aggs.map { case (name, a) => name + " = sbt.callPackage " + a + " { inherit sbt deps; };" }.mkString("\n")}
             |}""".stripMargin
@@ -95,6 +97,7 @@ object NixPlugin extends Plugin {
             |  ${alldeps.distinct.map(a => lib(a.artifact, a.binary)).mkString("\n  ")}
             |}""".stripMargin
       FileUtils.save(base / "deps.nix", deps).unsafePerformIO()
+
       val sbtstr = Source.fromInputStream(getClass.getResourceAsStream("/sbt.nix"))
       try {
         FileUtils.save(base / "sbt.nix", sbtstr.getLines().mkString("\n")).unsafePerformIO()
@@ -172,6 +175,19 @@ object NixPlugin extends Plugin {
       case Some(a) => a.success
       case None => "Undefined setting '%s'!".format(key.key).failNel
     }
+
+  def javacVersion(javacOptions: Seq[String]): String = {
+    val sflagIndex = javacOptions.indexOf("-source")
+    if (sflagIndex == -1) "openjdk"
+    else {
+      javacOptions(sflagIndex + 1) match {
+        case "1.6" => "oraclejdk"
+        case "1.7" => "oraclejdk7"
+        case "1.8" => "oraclejdk8"
+        case _ => "openjdk"
+      }
+    }
+  }
 
   def extracted(state: State): Extracted = Project.extract(state)
 
