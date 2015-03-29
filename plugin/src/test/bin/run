@@ -1,0 +1,33 @@
+#!/bin/sh -eu
+
+# A hacky little script to test that sbt2nix works end-to-end
+# Requires nix-build to be on the $PATH
+
+DIR=$(dirname $0)
+
+FAILED=""
+
+export PATH=${PATH}:${DIR}/../../../..
+
+# FIX Can we do this differently just with package?
+sbt publishLocal
+
+# Run all the tests, capturing any failures
+TEST_DIR="/tmp/sbt2nix-test-$$"
+for TEST in ${DIR}/tests/*; do
+    echo "*** Executing `basename ${TEST}` ***"
+    echo
+    ${DIR}/test "${TEST}" "${TEST_DIR}/$(basename ${TEST})" || {
+        FAILED="${FAILED}${TEST} "
+    }
+    echo
+done
+rm -r "${TEST_DIR}"
+
+if [ -n "${FAILED}" ]; then
+    echo "Tests failed!"
+    for TEST in ${FAILED}; do echo "* ${TEST}"; done
+    exit 1
+else
+    echo "Tests passed!"
+fi

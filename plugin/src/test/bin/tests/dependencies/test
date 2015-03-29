@@ -1,0 +1,7 @@
+#!/bin/sh -eu
+
+nix-build --arg commons-lang_commons-lang_2_5 '(import ./extra.nix {}).commons-lang_commons-lang_2_6'
+
+D1=$(nix-build)
+D2=$(nix-build)
+[ ${D1} == ${D2} ]

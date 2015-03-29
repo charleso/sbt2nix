@@ -1,0 +1,18 @@
+#!/bin/sh -eu
+
+TEST=${1:?"Test folder must be specified"}
+OUT=${2:?"Output folder must be specified"}
+DIR=$(dirname $0)
+
+mkdir -p "${OUT}"
+cp -r "${DIR}/template/" "${OUT}"
+cp -r "${TEST}/" "${OUT}"
+cd "${OUT}"
+sbt nix
+
+# Two builds should always have the same derivation - this can break if we're not careful
+D1=$(nix-build)
+D2=$(nix-build)
+[ ${D1} == ${D2} ]
+
+./test
