@@ -70,7 +70,6 @@ object NixPlugin extends Plugin {
             |in sbt.mkDerivation {
             |  pname = "$name";
             |  version = "$version";
-            |  src = ./.;
             |  sources = [ ${src.mkString(" ")} ];
             |  modules = [ ${projs.map(_._1).mkString(" ")} ];
             |  scalacOptions = "$scalacOpts";

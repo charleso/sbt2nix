@@ -31,6 +31,8 @@ let
       ...
     }: stdenv.mkDerivation(args // {
     name = "${pname}";
+    src = sources;
+    sourceRoot = ".";
     nativeBuildInputs = [ jdk scala ];
     buildInputs = buildDepends ++ modules;
     # TODO Don't call javac if there are no java files
