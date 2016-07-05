@@ -10,9 +10,9 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       name := "sbt2nix",
       libraryDependencies ++= Seq(
-       "commons-codec"  % "commons-codec"  % "1.6",
-        "org.scalaz"  %% "scalaz-core"  % "7.0.2",
-       "org.scalaz" %% "scalaz-effect" % "7.0.2")
+        "commons-codec"  % "commons-codec"  % "1.6",
+        "org.scalaz"  %% "scalaz-core"  % "7.3.0-M3",
+        "org.scalaz" %% "scalaz-effect" % "7.3.0-M3")
     )
   )
 
@@ -28,7 +28,7 @@ object Build extends Build {
         System.getProperty("sbt.build.version", sbtVersion)
       },
       scalaVersion <<= (sbtVersion in GlobalScope) {
-        case sbt013 if sbt013.startsWith("0.13.") => "2.10.4"
+        case sbt013 if sbt013.startsWith("0.13.") => "2.10.5"
         case sbt012 if sbt012.startsWith("0.12.") => "2.9.3"
         case _ => "2.9.3"
       },
