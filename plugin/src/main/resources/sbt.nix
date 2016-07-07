@@ -34,13 +34,14 @@ let
     src = sources;
     sourceRoot = ".";
     nativeBuildInputs = [ jdk scala ];
-    buildInputs = buildDepends ++ modules;
+    buildInputs = [ pkgs.unzip pkgs.zip ] ++ buildDepends ++ modules;
     # TODO Don't call javac if there are no java files
     buildPhase = ''
       mkdir -p target/classes
       scalac $scalacOptions -d target/classes $(find $sources -name \*.scala -or -name \*.java)
       javac -d target/classes -classpath target/classes $(find $sources -name \*.java) || echo
-      { cd target/classes; jar cfv $pname.jar $(find . -name \*.class); }
+      . ${<nixpkgs/pkgs/build-support/release/functions.sh>}
+      { cd target/classes; jar cfv $pname.jar $(find . -name \*.class); canonicalizeJar $pname.jar; }
     '';
     installPhase = ''
       mkdir -p $out/share/java
