@@ -1,6 +1,10 @@
 sbt2nix
 =======
 
+## Stop Here!
+
+See https://github.com/teozkr/Sbtix for a more recent SBT Nix project that is being actively worked on.
+
 Generate Nix build instructions from a SBT project
 
 [![Build Status](https://travis-ci.org/charleso/sbt2nix.png)](https://travis-ci.org/charleso/sbt2nix)
