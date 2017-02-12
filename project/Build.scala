@@ -10,9 +10,9 @@ object Build extends Build {
     settings = commonSettings ++ Seq(
       name := "sbt2nix",
       libraryDependencies ++= Seq(
-       "commons-codec"  % "commons-codec"  % "1.6",
-        "org.scalaz"  %% "scalaz-core"  % "7.0.2",
-       "org.scalaz" %% "scalaz-effect" % "7.0.2")
+       "commons-codec"  % "commons-codec"  % "1.10",
+        "org.scalaz"  %% "scalaz-core"  % "7.3.0-M3",
+       "org.scalaz" %% "scalaz-effect" % "7.3.0-M3")
     )
   )
 

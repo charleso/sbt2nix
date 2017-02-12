@@ -2,6 +2,7 @@ package sbt2nix
 
 import sbt.Keys._
 import sbt._
+import sbt.Configurations.CompilerPlugin
 
 import scala.io.Source
 import scalaz.NonEmptyList
@@ -43,6 +44,19 @@ object NixPlugin extends Plugin {
 
         val deps = externalDependencies(ref, state)(config)
         deps.foreach(alldeps += _)
+        val scalaVersion = setting(Keys.scalaBinaryVersion in ref, state).getOrElse("2.11")
+        val pluginDeps = externalDependencies(ref, state)(CompilerPlugin).filter {
+          case lib =>
+            // A plugin can't have dependencies other than scala-library and
+            // scala-compiler. Others seem to get implicitly included, even
+            // though they can't be used.
+            !(lib.artifact.organization == "org.scala-lang.modules" &&
+              Set(
+                s"scala-parser-combinators_${scalaVersion}",
+                s"scala-xml_${scalaVersion}"
+              ).contains(lib.artifact.name))
+        }
+        pluginDeps.foreach(alldeps += _)
         val name = setting(Keys.name in ref, state).getOrElse("Unknown")
         // TODO Use \/
         val version = setting(Keys.version in ref, state).getOrElse("1.0-SNAPSHOT")
@@ -63,7 +77,7 @@ object NixPlugin extends Plugin {
           val scalacOpts = evaluateTask(Keys.scalacOptions, ref, state).mkString(" ")
 
           s"""{ sbt ? import $depsPath/sbt.nix { jdk = (import <nixpkgs> {}).$javacV ;}, deps ? import $depsPath/deps.nix { inherit sbt; }
-            |${deps.map(x => ", " + toName(x.artifact) + " ? " + "deps." + toName(x.artifact)).mkString("")} }:
+            |${(deps ++ pluginDeps).toSet[Lib].toList.map(x => ", " + toName(x.artifact) + " ? " + "deps." + toName(x.artifact)).mkString("")} }:
             |let
             |${projs.map(x => proj(x._1, x._2)).mkString("\n")}
             |
@@ -72,7 +86,7 @@ object NixPlugin extends Plugin {
             |  version = "$version";
             |  sources = [ ${src.mkString(" ")} ];
             |  modules = [ ${projs.map(_._1).mkString(" ")} ];
-            |  scalacOptions = "$scalacOpts";
+            |  scalacOptions = "$scalacOpts ${pluginDeps.map(x => s"-Xplugin:$${${toName(x.artifact)}.jar}").mkString(" ")}";
             |  buildDepends = [
             |    ${deps.map(x => toName(x.artifact)).mkString(" ")}
             |  ];
@@ -157,10 +171,12 @@ object NixPlugin extends Plugin {
   def baseDirectory(ref: Reference, state: State): Validation[File] =
     setting(Keys.baseDirectory in ref, state)
 
-  def isInConfiguration(configuration: Configuration,
+  def isInConfiguration(
+    configuration: Configuration,
     ref: ProjectRef,
     dependency: ClasspathDep[ProjectRef],
-    state: State): Boolean = {
+    state: State
+  ): Boolean = {
     Classpaths.mapped(
       dependency.configuration,
       Configurations.names(Classpaths.getConfigurations(ref, structure(state).data)),
@@ -172,7 +188,7 @@ object NixPlugin extends Plugin {
   def setting[A](key: SettingKey[A], state: State): Validation[A] =
     key get structure(state).data match {
       case Some(a) => a.success
-      case None => "Undefined setting '%s'!".format(key.key).failNel
+      case None => "Undefined setting '%s'!".format(key.key).failureNel
     }
 
   def javacVersion(javacOptions: Seq[String]): String = {
