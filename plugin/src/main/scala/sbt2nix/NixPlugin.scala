@@ -172,7 +172,7 @@ object NixPlugin extends Plugin {
   def setting[A](key: SettingKey[A], state: State): Validation[A] =
     key get structure(state).data match {
       case Some(a) => a.success
-      case None => "Undefined setting '%s'!".format(key.key).failNel
+      case None => "Undefined setting '%s'!".format(key.key).failureNel
     }
 
   def javacVersion(javacOptions: Seq[String]): String = {
